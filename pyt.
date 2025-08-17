@@ -1,0 +1,35 @@
+# Step 1: Import Libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Step 2: Load Dataset (Using a sample spam dataset)
+# You can download "spam.csv" dataset from Kaggle
+df = pd.read_csv("spam.csv", encoding="latin-1")[["v1", "v2"]]
+df.columns = ["label", "message"]
+
+# Step 3: Data Preprocessing
+df['label'] = df['label'].map({'ham': 0, 'spam': 1})  # ham=0, spam=1
+
+# Step 4: Train-Test Split
+X_train, X_test, y_train, y_test = train_test_split(df['message'], df['label'], 
+                                                    test_size=0.2, random_state=42)
+
+# Step 5: Feature Extraction (Bag of Words)
+vectorizer = CountVectorizer()
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+# Step 6: Train Model (Naive Bayes)
+model = MultinomialNB()
+model.fit(X_train_vec, y_train)
+
+# Step 7: Predictions
+y_pred = model.predict(X_test_vec)
+
+# Step 8: Evaluation
+print("✅ Accuracy:", accuracy_score(y_test, y_pred))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
